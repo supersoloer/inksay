@@ -1,0 +1,46 @@
+{
+  "name": "inksay",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:whisper": "node scripts/build-whisper.mjs",
+    "smoke:whisper": "node scripts/smoke-whisper.mjs",
+    "build:preview:macos": "bash scripts/build-preview-macos.sh",
+    "build:production:macos": "bash scripts/build-production-macos.sh",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "test:statistics": "node --experimental-strip-types --test tests/statistics.test.mjs",
+    "build:production:windows": "powershell -NoProfile -File scripts/build-production-windows.ps1",
+    "start:macos": "node scripts/start-macos.mjs",
+    "version:set": "node scripts/set-version.mjs",
+    "clean:build": "node scripts/clean-build.mjs",
+    "check:public": "node scripts/check-public-source.mjs",
+    "licenses:refresh": "node scripts/update-third-party-notices.mjs",
+    "package:source": "node scripts/package-source.mjs"
+  },
+  "dependencies": {
+    "@radix-ui/themes": "^3.3.0",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-autostart": "^2.5.1",
+    "@tauri-apps/plugin-clipboard-manager": "^2.3.3",
+    "lucide-react": "^1.48.0",
+    "opencc-js": "^1.4.2",
+    "radix-ui": "^1.6.7",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "recharts": "^3.10.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.16"
+  },
+  "license": "GPL-3.0-only",
+  "author": "唐小羲"
+}

@@ -1,0 +1,33 @@
+diff --git a/examples/server/server.cpp b/examples/server/server.cpp
+index aae74c3..e26409a 100644
+--- a/examples/server/server.cpp
++++ b/examples/server/server.cpp
+@@ -22,6 +22,9 @@
+ #if defined (_WIN32)
+ #include <windows.h>
+ #endif
++#if defined (__APPLE__)
++#include <unistd.h>
++#endif
+ 
+ using namespace httplib;
+ using json = nlohmann::ordered_json;
+@@ -642,6 +645,18 @@ int main(int argc, char ** argv) {
+         return 1;
+     }
+ 
++#if defined (__APPLE__)
++    const pid_t parent_pid = getppid();
++    std::thread([parent_pid]() {
++        while (true) {
++            std::this_thread::sleep_for(std::chrono::seconds(1));
++            if (getppid() != parent_pid) {
++                _exit(0);
++            }
++        }
++    }).detach();
++#endif
++
+     if (params.language != "auto" && whisper_lang_id(params.language.c_str()) == -1) {
+         fprintf(stderr, "error: unknown language '%s'\n", params.language.c_str());
+         whisper_print_usage(argc, argv, params, sparams);

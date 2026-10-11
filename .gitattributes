@@ -1,0 +1,16 @@
+* text=auto
+*.png binary
+*.icns binary
+*.ico binary
+*.bin binary
+*.wav binary
+/AGENTS.md export-ignore
+/ios export-ignore
+/docs/archive export-ignore
+/docs/reference export-ignore
+/docs/PROVENANCE.md export-ignore
+/docs/VERIFICATION.md export-ignore
+/docs/chatterfly-review-2026-09-29.md export-ignore
+/docs/typeless-package-prompt-review.md export-ignore
+/docs/open-typeless-review.md export-ignore
+/benchmarks export-ignore

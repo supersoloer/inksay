@@ -1,0 +1,61 @@
+--- a/examples/server/server.cpp
++++ b/examples/server/server.cpp
+@@ -829,6 +829,58 @@
+     svr->Options(sparams.request_path + sparams.inference_path, [&](const Request &, Response &){
+     });
+ 
++    // Inksay performs VAD before ASR, including the zero-speech case. Do not
++    // enter whisper_full's automatic language detection with an empty segment set.
++    std::unique_ptr<whisper_vad_context, decltype(&whisper_vad_free)> vad_context(nullptr, whisper_vad_free);
++    svr->Post(sparams.request_path + "/vad", [&](const Request &req, Response &res) {
++        std::lock_guard<std::mutex> lock(whisper_mutex);
++        if (!req.has_file("file")) {
++            res.status = 400;
++            res.set_content("{\"error\":\"missing audio\"}", "application/json");
++            return;
++        }
++        if (!vad_context) {
++            auto config = whisper_vad_default_context_params();
++            config.use_gpu = false;
++            config.n_threads = 2;
++            vad_context.reset(whisper_vad_init_from_file_with_params(default_params.vad_model.c_str(), config));
++            if (!vad_context) {
++                res.status = 500;
++                res.set_content("{\"error\":\"VAD model unavailable\"}", "application/json");
++                return;
++            }
++        }
++        const auto audio = req.get_file_value("file");
++        std::vector<float> samples;
++        std::vector<std::vector<float>> channels;
++        if (!read_audio_data(audio.content.data(), audio.content.size(), samples, channels, false) || samples.empty()) {
++            res.status = 400;
++            res.set_content("{\"error\":\"invalid audio\"}", "application/json");
++            return;
++        }
++        auto parameters = whisper_vad_default_params();
++        parameters.threshold = 0.5f;
++        parameters.min_speech_duration_ms = 120;
++        parameters.min_silence_duration_ms = 100;
++        parameters.speech_pad_ms = 80;
++        std::unique_ptr<whisper_vad_segments, decltype(&whisper_vad_free_segments)> segments(
++            whisper_vad_segments_from_samples(vad_context.get(), parameters, samples.data(), samples.size()),
++            whisper_vad_free_segments);
++        if (!segments) {
++            res.status = 500;
++            res.set_content("{\"error\":\"VAD inference failed\"}", "application/json");
++            return;
++        }
++        const int count = whisper_vad_segments_n_segments(segments.get());
++        float speech_ms = 0;
++        for (int i = 0; i < count; ++i) {
++            speech_ms += 10 * (whisper_vad_segments_get_segment_t1(segments.get(), i) -
++                               whisper_vad_segments_get_segment_t0(segments.get(), i));
++        }
++        json result = {{"speech", count > 0}, {"segments", count}, {"speech_ms", speech_ms}};
++        res.set_content(result.dump(), "application/json");
++    });
++
+     svr->Post(sparams.request_path + sparams.inference_path, [&](const Request &req, Response &res){
+         // acquire whisper model mutex lock
+         std::lock_guard<std::mutex> lock(whisper_mutex);

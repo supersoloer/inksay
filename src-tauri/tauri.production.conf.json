@@ -1,0 +1,22 @@
+{
+  "productName": "InkSay",
+  "identifier": "com.supersoloer.inksay.macos",
+  "app": {
+    "windows": [
+      {
+        "title": "InkSay",
+        "visible": false,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "trafficLightPosition": {
+          "x": 20,
+          "y": 18
+        },
+        "width": 980,
+        "height": 680,
+        "minWidth": 900,
+        "minHeight": 640
+      }
+    ]
+  }
+}

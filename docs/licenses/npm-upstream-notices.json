@@ -1,0 +1,16 @@
+{
+  "react-remove-scroll-bar@2.3.8": [
+    {
+      "path": "README license section",
+      "url": "https://www.npmjs.com/package/react-remove-scroll-bar/v/2.3.8",
+      "text": "# License\nMIT\n\nAuthors from published npm metadata: Anton Korzunov <thekashey@gmail.com>"
+    }
+  ],
+  "victory-vendor@37.3.6": [
+    {
+      "path": "README license section",
+      "url": "https://www.npmjs.com/package/victory-vendor/v/37.3.6",
+      "text": "## Licenses\n\nThis project is released under the MIT license, but the vendor'ed in libraries include other licenses (e.g. ISC) that we enumerate in our `package.json:license` field.\n\nAuthors from published npm metadata: Formidable"
+    }
+  ]
+}

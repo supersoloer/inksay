@@ -1,0 +1,45 @@
+name: Tauri check
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tauri-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+      - run: npm ci
+      - run: npm run check:public
+      - run: npm run test:statistics
+      - run: npm run build
+      - run: npm run build:whisper
+      - run: npm run smoke:whisper
+      - if: runner.os == 'macOS'
+        run: python3 scripts/test-vad-gate.py --speech src-tauri/resources/asr-test.wav
+      - if: runner.os == 'Windows'
+        run: python scripts/test-vad-gate.py --speech src-tauri/resources/asr-test.wav
+      - run: cargo check --manifest-path src-tauri/Cargo.toml --locked
+      - run: cargo test --manifest-path src-tauri/Cargo.toml --locked --lib
+      - name: Build Windows installer
+        if: matrix.os == 'windows-latest'
+        run: npm run tauri build -- --bundles nsis --config src-tauri/tauri.production.conf.json --config src-tauri/tauri.windows.conf.json
+      # Do not publish binaries before preparing matching GPL corresponding source and signing.

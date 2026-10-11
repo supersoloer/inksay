@@ -1,0 +1,14 @@
+{
+  "productName": "InkSay Preview",
+  "identifier": "com.supersoloer.inksay.macos.preview",
+  "app": {
+    "windows": [
+      {
+        "title": "InkSay Preview",
+        "visible": false,
+        "width": 980,
+        "height": 680
+      }
+    ]
+  }
+}

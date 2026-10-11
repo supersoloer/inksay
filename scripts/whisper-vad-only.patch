@@ -1,0 +1,74 @@
+--- a/examples/server/server.cpp
++++ b/examples/server/server.cpp
+@@ -123,6 +123,7 @@
+     std::string dtw                    = "";
+ 
+     // Voice Activity Detection (VAD) parameters
++    bool        vad_only                    = false;
+     bool        vad                         = false;
+     std::string vad_model                   = "";
+     float       vad_threshold               = 0.5f;
+@@ -260,6 +261,7 @@
+         else if (                   arg == "--tmp-dir")         { sparams.tmp_dir     = argv[++i]; }
+ 
+         // Voice Activity Detection (VAD)
++        else if (arg == "--vad-only") { params.vad_only = true; }
+         else if (                   arg == "--vad")                         { params.vad                         = true; }
+         else if (arg == "-vm"    || arg == "--vad-model")                   { params.vad_model                   = argv[++i]; }
+         else if (arg == "-vt"    || arg == "--vad-threshold")               { params.vad_threshold               = std::stof(argv[++i]); }
+@@ -729,15 +731,15 @@
+     std::unique_ptr<httplib::Server> svr = std::make_unique<httplib::Server>();
+     std::atomic<server_state> state{SERVER_STATE_LOADING_MODEL};
+ 
+-    struct whisper_context * ctx = whisper_init_from_file_with_params(params.model.c_str(), cparams);
+-
+-    if (ctx == nullptr) {
++    struct whisper_context * ctx = params.vad_only ? nullptr : whisper_init_from_file_with_params(params.model.c_str(), cparams);
++
++    if (!params.vad_only && ctx == nullptr) {
+         fprintf(stderr, "error: failed to initialize whisper context\n");
+         return 3;
+     }
+ 
+     // initialize openvino encoder. this has no effect on whisper.cpp builds that don't have OpenVINO configured
+-    whisper_ctx_init_openvino_encoder(ctx, nullptr, params.openvino_encode_device.c_str(), nullptr);
++    if (ctx) whisper_ctx_init_openvino_encoder(ctx, nullptr, params.openvino_encode_device.c_str(), nullptr);
+     state.store(SERVER_STATE_READY);
+ 
+ 
+@@ -884,6 +886,7 @@
+     svr->Post(sparams.request_path + sparams.inference_path, [&](const Request &req, Response &res){
+         // acquire whisper model mutex lock
+         std::lock_guard<std::mutex> lock(whisper_mutex);
++        if (default_params.vad_only) { res.status = 409; res.set_content("VAD-only service", "text/plain"); return; }
+ 
+         // first check user requested fields of the request
+         if (!req.has_file("file"))
+@@ -1209,6 +1212,7 @@
+         }
+     });
+     svr->Post(sparams.request_path + "/load", [&](const Request &req, Response &res){
++        if (default_params.vad_only) { res.status = 409; res.set_content("VAD-only service", "text/plain"); return; }
+         std::lock_guard<std::mutex> lock(whisper_mutex);
+         state.store(SERVER_STATE_LOADING_MODEL);
+         if (!req.has_file("model"))
+@@ -1230,7 +1234,7 @@
+         }
+ 
+         // clean up
+-        whisper_free(ctx);
++        if (ctx) whisper_free(ctx);
+ 
+         // whisper init
+         ctx = whisper_init_from_file_with_params(model.c_str(), cparams);
+@@ -1325,8 +1329,8 @@
+ 
+     // clean up function, to be called before exit
+     auto clean_up = [&]() {
+-        whisper_print_timings(ctx);
+-        whisper_free(ctx);
++        if (ctx) whisper_print_timings(ctx);
++        if (ctx) whisper_free(ctx);
+     };
+ 
+     std::thread t([&] {
