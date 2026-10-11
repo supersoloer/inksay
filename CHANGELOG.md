@@ -1,6 +1,6 @@
 # 更新记录
 
-## 0.1.0 — 首次公开发布准备中
+## 0.1.0 — 桌面源码公开（2026-10-12）
 
 ### 桌面
 
@@ -16,4 +16,4 @@
 - macOS Apple Silicon 为主要验证平台，Windows x64 为开发预览。
 - 本次只公开桌面端源码，不包含 iOS。
 - 许可证为 GPL-3.0-only，第三方组件保留各自许可证。
-- 尚未建立公开仓库、Tag、GitHub Release 或完成 macOS 公证。
+- 桌面源码已发布至 `supersoloer/inksay` 的 `main`；尚未发布二进制 Release、Tag 或完成 macOS 公证。

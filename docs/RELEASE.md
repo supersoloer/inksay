@@ -2,7 +2,7 @@
 
 ## 当前准备范围
 
-当前准备的是首个 GPL-3.0-only 桌面源码发布，iOS 不在本次公开范围内。尚未创建公开远程仓库、公开 Tag 或 GitHub Release。macOS 公证、Windows 代码签名不属于已经完成的事项。
+当前准备的是首个 GPL-3.0-only 桌面源码发布，iOS 不在本次公开范围内。源码已公开至 [supersoloer/inksay](https://github.com/supersoloer/inksay)；尚未发布公开 Tag 或二进制 GitHub Release。macOS 公证、Windows 代码签名不属于已经完成的事项。
 
 ## 首次公开源码
 

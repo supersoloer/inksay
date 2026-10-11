@@ -26,8 +26,14 @@
 
 ## 尚未执行
 
-- 创建公开 GitHub 仓库、公开推送、Tag 或 Release。需要维护者确定公开远程地址后明确执行。
+- 公开 Tag 或二进制 Release。源码公开推送已于 2026-10-12 完成。
 - 对外二进制发行的完整对应源码交付、macOS Developer ID / 公证、Windows Authenticode 签名。
 - 本次 Windows 实机功能验收。CI 文件已准备，但没有远程执行结果。
 
 首次公开可以使用 `build/releases/source/` 中最终导出的项目源码包初始化新的公开仓库。不要直接镜像推送本地开发历史。二进制发行需另外完成 [RELEASE.md](RELEASE.md) 中的检查。
+
+## 公开记录（2026-10-12）
+
+桌面源码已发布到 https://github.com/supersoloer/inksay 的 `main`。公开仓库从经过导出检查的桌面源码初始化，首个公开 commit 为 `00fe98b`，不含 iOS、私人开发历史、内部调研、恢复归档、模型缓存或安装包。
+
+仓库采用 GPL-3.0-only。此记录描述源码公开，不代表二进制公证、签名和对应源码交付完成。
